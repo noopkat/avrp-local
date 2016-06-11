@@ -20,7 +20,7 @@ module.exports.requestCompilation = function(package, callback) {
   mkdirp(paths.dest);
 
   var customLibsArgs = libpaths.map(function(lpath) {
-    return '-libraries=' + path.resolve(lpath);
+    return '-libraries=' + path.dirname(lpath);
   });
 
   switch (os.platform()) {
@@ -68,7 +68,7 @@ module.exports.requestCompilation = function(package, callback) {
       '-tools=' + paths.tools,
       '-tools=' + paths.toolsBuilder,
       '-fqbn=arduino:avr:' + board,
-      '-built-in-libraries=' + paths.libs,
+      '-built-in-libraries="' + paths.libs,
       customLibsArgs.join(' '),
       '-ide-version=' + version,
       '-build-path=' + paths.dest,
