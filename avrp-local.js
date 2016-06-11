@@ -68,7 +68,7 @@ module.exports.requestCompilation = function(package, callback) {
       '-tools=' + paths.tools,
       '-tools=' + paths.toolsBuilder,
       '-fqbn=arduino:avr:' + board,
-      '-built-in-libraries=' + libsPath,
+      '-built-in-libraries=' + paths.libs,
       customLibsArgs.join(' '),
       '-ide-version=' + version,
       '-build-path=' + paths.dest,
