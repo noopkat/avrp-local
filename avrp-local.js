@@ -20,7 +20,7 @@ module.exports.requestCompilation = function(package, callback) {
   mkdirp(paths.dest);
 
   var customLibsArgs = libpaths.map(function(lpath) {
-    return '-libraries=' + path.dirname(lpath);
+    return '-libraries="' + path.dirname(lpath) + '"';
   });
 
   // TODO: DRY this the heck up, gosh.
@@ -32,24 +32,27 @@ module.exports.requestCompilation = function(package, callback) {
       paths.libs =  path.join(builderPath, 'libraries');
       paths.hardware = path.join(builderPath, 'hardware');
       paths.toolsBuilder = path.join(builderPath, 'tools-builder');
+      paths.builderExec = path.join(builderPath, 'arduino-builder');
       break;
     }
 
     case 'linux': {
-      builderPath = path.resolve(builder.location);
+      builderPath = builder.location;
       paths.tools = path.join(builderPath, 'hardware', 'tools');
       paths.libs =  path.join(builderPath, 'libraries');
       paths.hardware = path.join(builderPath, 'hardware');
       paths.toolsBuilder = path.join(builderPath, 'tools-builder');
+      paths.builderExec = path.join(builderPath, 'arduino-builder');
       break;
     }
 
     case 'win32': {
-      // TODO: check what this is by installing arduino on windows box
-      // TODO: find tools, hardware, buildertools, and lib paths
-      // builderPath = path.resolve(builder.location);
-      var error = new Error('Oops! Sorry, local build is currently an unsupported feature on Windows, check back soon.');
-      return callback(error);
+      builderPath = builder.location;
+      paths.tools = path.join(builderPath, 'hardware', 'tools');
+      paths.libs =  path.join(builderPath, 'libraries');
+      paths.hardware = path.join(builderPath, 'hardware');
+      paths.toolsBuilder = path.join(builderPath, 'tools-builder');
+      paths.builderExec = '"' + path.join(builderPath, 'arduino-builder') + '"';
       break;
     }
 
@@ -65,21 +68,21 @@ module.exports.requestCompilation = function(package, callback) {
     // assemble all options and flags for Arduino Builder based on the facts
     var builderString = [
       '-compile',
-      '-hardware=' + paths.hardware,
-      '-tools=' + paths.tools,
-      '-tools=' + paths.toolsBuilder,
-      '-fqbn=arduino:avr:' + board,
-      '-built-in-libraries=' + paths.libs,
+      '-hardware="' + paths.hardware + '"',
+      '-tools="' + paths.tools + '"',
+      '-tools="' + paths.toolsBuilder + '"',
+      '-fqbn="arduino:avr:' + board + '"',
+      '-built-in-libraries="' + paths.libs + '"',
       customLibsArgs.join(' '),
-      '-ide-version=' + version,
-      '-build-path=' + paths.dest,
-      '-debug-level=10',
+      '-ide-version="' + version + '"',
+      '-build-path="' + paths.dest + '"',
+      '-debug-level="10' + '"',
       // '-warnings=none',
-      path.resolve(sketchfile)
+      '"' + sketchfile + '"'
     ].join(' ');
 
     // run Arduino Builder in a child process (yay cmd line apps)
-    var builderChild = child.exec(path.join(builderPath, 'arduino-builder') + ' ' + builderString, function(error) {
+    var builderChild = child.exec(paths.builderExec + ' ' + builderString, function(error) {
       // something went wrong
       if (error) return callback(error);
 
