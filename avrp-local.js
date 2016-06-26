@@ -23,6 +23,7 @@ module.exports.requestCompilation = function(package, callback) {
     return '-libraries=' + path.dirname(lpath);
   });
 
+  // TODO: DRY this the heck up, gosh.
   switch (os.platform()) {
     case 'darwin': {
       // theoretically the user would supply the direct path to the Arduino.app location, including the app file in the path
@@ -68,7 +69,7 @@ module.exports.requestCompilation = function(package, callback) {
       '-tools=' + paths.tools,
       '-tools=' + paths.toolsBuilder,
       '-fqbn=arduino:avr:' + board,
-      '-built-in-libraries="' + paths.libs,
+      '-built-in-libraries=' + paths.libs,
       customLibsArgs.join(' '),
       '-ide-version=' + version,
       '-build-path=' + paths.dest,
