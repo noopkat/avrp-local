@@ -1,6 +1,6 @@
 {
   "name": "avrp-local",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "do the pizza thing locally",
   "main": "avrp-local.js",
   "dependencies": {
