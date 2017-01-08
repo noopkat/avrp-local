@@ -8,10 +8,14 @@ var fs = require('fs');
 
 module.exports.requestCompilation = function(package, callback) {
   var libpaths = package.libraries || [];
+  var hwpaths = package.hardware || [];
+  var toolspaths = package.tools || [];
   var sketchfile = path.resolve(package.sketch);
   var board = package.board || 'uno';
   var version = package.version || '10609';
   var builder = package.builder;
+  var manufacturer = package.manufacturer || 'arduino';
+  var arch = package.arch || 'avr';
 
   var id = uuid.v1();
   var paths = {};
@@ -21,6 +25,14 @@ module.exports.requestCompilation = function(package, callback) {
 
   var customLibsArgs = libpaths.map(function(lpath) {
     return '-libraries="' + path.dirname(lpath) + '"';
+  });
+
+  var customHardwareArgs = hwpaths.map(function(lpath) {
+    return '-hardware="' + lpath + '"';
+  });
+
+  var customToolsArgs = toolspaths.map(function(lpath) {
+    return '-tools="' + lpath + '"';
   });
 
   // TODO: DRY this the heck up, gosh.
@@ -71,9 +83,11 @@ module.exports.requestCompilation = function(package, callback) {
       '-hardware="' + paths.hardware + '"',
       '-tools="' + paths.tools + '"',
       '-tools="' + paths.toolsBuilder + '"',
-      '-fqbn="arduino:avr:' + board + '"',
+      '-fqbn="' + manufacturer + ':' + arch + ':' + board + '"',
       '-built-in-libraries="' + paths.libs + '"',
       customLibsArgs.join(' '),
+      customHardwareArgs.join(' '),
+      customToolsArgs.join(' '),
       '-ide-version="' + version + '"',
       '-build-path="' + paths.dest + '"',
       '-debug-level="10' + '"',
